@@ -7,7 +7,7 @@ const SignupForm = () => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
-    // 유효성 검사
+    // 에러 메세지 담을 공간
     const [error, setError] = useState({
         email: "",
         nickname: "",
@@ -20,7 +20,6 @@ const SignupForm = () => {
         return value.includes("@");
     };
 
- 
     const validNickname = (value: string) => {
         // 몰라서 지피티 한테 물어봄
         return /^[a-z0-9]{2,10}$/.test(value);
