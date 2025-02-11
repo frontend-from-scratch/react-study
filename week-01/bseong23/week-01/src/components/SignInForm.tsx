@@ -1,82 +1,174 @@
-import { useState } from "react";
-import { Button, TextField } from "@mui/material";
+import React, { useState, useEffect } from "react"
+import MyInput from "./MyTextField"
+import MyButton from "./MyButton"
 
-const SignupForm = () => {
-    const [email, setEmail] = useState("");
-    const [nickname, setNickname] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
+interface FormData {
+  email: string
+  nickname: string
+  password: string
+  passwordConfirm: string
+}
 
-    // 에러 메세지 담을 공간
-    const [error, setError] = useState({
-        email: "",
-        nickname: "",
-        password: "",
-        confirmPassword: ""
-    });
+interface FormErrors {
+  email?: string
+  nickname?: string
+  password?: string
+  passwordConfirm?: string
+}
 
-    // 이메일에 @가 있는지 확인
-    const validEmail = (value: string) => {
-        return value.includes("@");
-    };
+const SignUpForm: React.FC = () => {
+  const [formData, setFormData] = useState<FormData>({
+    email: "",
+    nickname: "",
+    password: "",
+    passwordConfirm: "",
+  })
 
-    const validNickname = (value: string) => {
-        // 몰라서 지피티 한테 물어봄
-        return /^[a-z0-9]{2,10}$/.test(value);
-    };
+  const [errors, setErrors] = useState<FormErrors>({})
+  const [isFormValid, setIsFormValid] = useState(false)
 
-    const validPassword = (value: string) => {
-        // 몰라서 지피티 한테 물어봄
-        return /^[a-z0-9]{4,16}$/.test(value);
-    };
+  // 이메일 유효성 검사
+  const validateEmail = (email: string): string => {
+    if (!email) return "이메일을 입력해주세요."
+    if (!email.includes("@")) return "올바른 이메일 형식이 아닙니다."
+    return ""
+  }
 
-    // 아니 e: React.ChangeEvent<HTMLInputElement> 이게 타입스크팁트겠지? event에 대한 타입을 정해준거겠지?
-    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setEmail(value);
-        setError((prev) => ({ ...prev, email: validEmail(value) ? "" : "이메일 형식이 올바르지 않습니다." }));
-    };
+  // 닉네임 유효성 검사
+  const validateNickname = (nickname: string): string => {
+    if (!nickname) return "닉네임을 입력해주세요."
+    if (nickname.length < 2 || nickname.length > 10) {
+      return "닉네임은 2~10자 사이여야 합니다."
+    }
+    if (!/^(?=.*[a-z])(?=.*\d).+$/.test(nickname)) {
+      return "영문 소문자와 숫자를 각각 하나 이상 포함해야 합니다."
+    }
+    return ""
+  }
 
-    // 먼저 닉네임 state를 업데이트
-    // 그 다음 닉네임 유효성 검사
-    // 만약 유효성 검사 통과하면 ""로 null값을 넣어줌, 초기값과 동일
-    // 만약 유효성 검사 통과 못하면 에러메세지 넣어줌 그럼 에러메세지가 helperText에 뜨게됨
-    const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setNickname(value);
-        setError((prev) => ({ ...prev, nickname: validNickname(value) ? "" : "닉네임은 영문 소문자 및 숫자로 2~10자여야 합니다." }));
-    };
+  // 비밀번호 유효성 검사
+  const validatePassword = (password: string): string => {
+    if (!password) return "비밀번호를 입력해주세요."
+    if (password.length < 4 || password.length > 16) {
+      return "비밀번호는 4~16자 사이여야 합니다."
+    }
+    if (!/^(?=.*[a-z])(?=.*\d).+$/.test(password)) {
+      return "영문 소문자와 숫자를 각각 하나 이상 포함해야 합니다."
+    }
+    return ""
+  }
 
-    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setPassword(value);
-        setError((prev) => ({ ...prev, password: validPassword(value) ? "" : "비밀번호는 영문 소문자 및 숫자로 4~16자여야 합니다." }));
-    };
+  // 비밀번호 확인 유효성 검사
+  const validatePasswordConfirm = (passwordConfirm: string): string => {
+    if (!passwordConfirm) return "비밀번호 확인을 입력해주세요."
+    if (passwordConfirm !== formData.password) {
+      return "비밀번호가 일치하지 않습니다."
+    }
+    return ""
+  }
 
-    const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setConfirmPassword(value);
-        setError((prev) => ({ ...prev, confirmPassword: value === password ? "" : "비밀번호가 일치하지 않습니다." }));
-    };
+  // 입력값 변경 핸들러
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
 
-    // 이메일 닉네임 비밀번호 비밀번호 확인 state가 채워진지 확인
-    // 그다음 에러에 안채워져있다면 통과
-    const isFormValid =
-        email && nickname && password && confirmPassword &&
-        !error.email && !error.nickname && !error.password && !error.confirmPassword;
+  // 폼 제출 핸들러
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (isFormValid) {
+      console.log("실제로는 여기에 API호출 하면 될까요~?")
+    }
+  }
 
-    // 회원가입 버튼을 누르면 입력한 정보를 서버로 전송합니다.
-    return (
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "300px", margin: "20px auto" }}>
-            <TextField label="이메일" type="email" value={email} onChange={handleEmailChange} error={!!error.email} helperText={error.email} />
-            <TextField label="닉네임" value={nickname} onChange={handleNicknameChange} error={!!error.nickname} helperText={error.nickname} />
-            <TextField label="비밀번호" type="password" value={password} onChange={handlePasswordChange} error={!!error.password} helperText={error.password} />
-            <TextField label="비밀번호 확인" type="password" value={confirmPassword} onChange={handleConfirmPasswordChange} error={!!error.confirmPassword} helperText={error.confirmPassword} />
-            <Button variant="contained" color="primary" disabled={!isFormValid}>회원가입</Button>
-        </div>
-    );
-    // !한번쓰면 불리언값으로 바꿔줌 지금 null값에서
-    // !두번 쓰면 원래의 불리언값을 얻을 수 있다.
-};
+  // 전체 폼 유효성 검사
+  useEffect(() => {
+    const newErrors: FormErrors = {
+      email: validateEmail(formData.email),
+      nickname: validateNickname(formData.nickname),
+      password: validatePassword(formData.password),
+      passwordConfirm: validatePasswordConfirm(formData.passwordConfirm),
+    }
 
-export default SignupForm;
+    setErrors(newErrors)
+
+    // 모든 필드가 유효한지 확인
+    const isValid = Object.values(newErrors).every((error) => error === "")
+    setIsFormValid(isValid)
+  }, [formData])
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      style={{ maxWidth: "400px", margin: "0 auto", padding: "20px" }}
+    >
+      <div style={{ marginBottom: "20px" }}>
+        <MyInput
+          label="이메일"
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          error={!!errors.email}
+          helperText={errors.email}
+          required
+        />
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <MyInput
+          label="닉네임"
+          type="text"
+          name="nickname"
+          value={formData.nickname}
+          onChange={handleChange}
+          error={!!errors.nickname}
+          helperText={errors.nickname}
+          required
+        />
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <MyInput
+          label="비밀번호"
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
+          error={!!errors.password}
+          helperText={errors.password}
+          required
+        />
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <MyInput
+          label="비밀번호 확인"
+          type="password"
+          name="passwordConfirm"
+          value={formData.passwordConfirm}
+          onChange={handleChange}
+          error={!!errors.passwordConfirm}
+          helperText={errors.passwordConfirm}
+          required
+        />
+      </div>
+
+      <MyButton
+        variant="contained"
+        color="primary"
+        fullWidth
+        disabled={!isFormValid}
+        loading
+        loadingPosition="center"
+      >
+        회원가입
+      </MyButton>
+    </form>
+  )
+}
+
+export default SignUpForm

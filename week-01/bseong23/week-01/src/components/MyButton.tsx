@@ -1,30 +1,57 @@
+import React from "react"
 import "./MyButton.css"
-import { useState } from "react";
 
-const MyButton = () => {
-    const [loading, setLoading] = useState(false);
+interface MyButtonProps {
+  variant?: "contained" | "outlined" | "text"
+  size?: "small" | "medium" | "large"
+  color?: "primary" | "secondary" | "error" | "warning" | "info" | "success"
+  disabled?: boolean
+  position?: "start" | "center" | "end"
+  loading?: boolean
+  loadingPosition?: "start" | "center" | "end"
+  fullWidth?: boolean
+  onClick?: () => void
+  children?: React.ReactNode
+}
 
-    const handleLoading = () => {
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
-        }, 2000);
-    }
+const MyButton: React.FC<MyButtonProps> = ({
+  variant = "contained",
+  size = "medium",
+  color = "primary",
+  disabled = false,
+  position = "center",
+  loading = false,
+  loadingPosition = "start",
+  fullWidth = false,
+  onClick,
+  children = "Button",
+}) => {
+  const buttonClass = [
+    "button",
+    variant,
+    color,
+    size,
+    `position-${position}`,
+    fullWidth ? "fullWidth" : "",
+  ]
+    .filter(Boolean)
+    .join(" ")
 
-    return (
-    <>
-        <div className="buttonContainer">
-            <button className="firstBtn">1번</button>
-            <button className="secondBtn" disabled={true}>2번</button>
-            <button className="thirdBtn" onClick={handleLoading} disabled={loading}>
-                {loading ? "로딩 중" : "3번"}
-            </button>
-        </div>
-        <div style={{width: "200px", margin: "10px auto"}}>
-            <button className="fourthBtn">4번</button>
-        </div>
-    </>
-    )
-};
+  const LoadingSpinner = () => (
+    <div className={`spinner position-${loadingPosition}`} />
+  )
 
-export default MyButton;
+  return (
+    <button
+      className={buttonClass}
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+    >
+      {loading && loadingPosition === "start" && <LoadingSpinner />}
+      {children}
+      {loading && loadingPosition === "end" && <LoadingSpinner />}
+    </button>
+  )
+}
+
+export default MyButton

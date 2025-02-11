@@ -1,19 +1,85 @@
-import { TextField } from "@mui/material";
+import React from "react"
+import "./MyTextField.css"
 
-const MyTextField = () => {
-    return (
-        <div style={{display: "flex", flexDirection: "column", gap: "10px", width: "200px", margin: "10px auto"}}>        
-            <TextField label="로그인" type="email"></TextField>
-            <TextField label="비밀번호" type="password"></TextField>
-            <TextField value={"Hello"} size="small"></TextField>
-            <TextField disabled={true} placeholder="disabled"></TextField>
-            <TextField error={true} helperText="error"></TextField>
-            <TextField fullWidth={true} label="Full Width"></TextField>
-            <TextField variant="filled" label="Filled"></TextField>
-            <TextField variant="outlined" label="Outlined"></TextField>
-            <TextField variant="standard" label="Standard"></TextField>
-        </div>
-    );
+interface MyTextFieldProps {
+  value: string
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  type?: "text" | "password" | "email" | "number" | "tel"
+  placeholder?: string
+  label?: string
+  helperText?: string
+  error?: boolean
+  disabled?: boolean
+  required?: boolean
+  variant?: "outlined" | "filled" | "standard"
+  size?: "small" | "medium"
+  readOnly?: boolean
+  name?: string
+  id?: string
+  className?: string
 }
 
-export default MyTextField;
+const MyTextField: React.FC<MyTextFieldProps> = ({
+  value,
+  onChange,
+  type = "text",
+  placeholder = "",
+  label,
+  helperText,
+  error = false,
+  disabled = false,
+  required = false,
+  variant = "outlined",
+  size = "medium",
+  readOnly = false,
+  name,
+  id,
+  className = "",
+}) => {
+  const inputClasses = [
+    "input-field",
+    variant,
+    size,
+    error ? "error" : "",
+    readOnly ? "readonly" : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ")
+
+  const labelClasses = [
+    "input-label",
+    error ? "error" : "",
+    disabled ? "disabled" : "",
+    required ? "required" : "",
+  ]
+    .filter(Boolean)
+    .join(" ")
+
+  const helperTextClasses = ["helper-text", error ? "error" : ""]
+    .filter(Boolean)
+    .join(" ")
+
+  return (
+    <div className="input-container">
+      {label && <label className={labelClasses}>{label}</label>}
+      <div className="input-wrapper">
+        <input
+          type={type}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          disabled={disabled}
+          required={required}
+          readOnly={readOnly}
+          className={inputClasses}
+          name={name}
+          id={id}
+        />
+      </div>
+      {helperText && <span className={helperTextClasses}>{helperText}</span>}
+    </div>
+  )
+}
+
+export default MyTextField
