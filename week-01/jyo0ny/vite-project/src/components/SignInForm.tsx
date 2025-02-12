@@ -1,10 +1,13 @@
 import React, { useState } from "react";
+import Button from "./Button";
+import TextField from "./TextField";
 
 const SignInForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [nickname, setNickname] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState({
     email: "",
     nickname: "",
@@ -28,7 +31,7 @@ const SignInForm: React.FC = () => {
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    console.log(e.target.value);
+    // console.log(e.target.value);
     setEmail(value);
     setError((prev) => ({
       ...prev,
@@ -71,60 +74,74 @@ const SignInForm: React.FC = () => {
   };
 
   const isFormValid =
+    // 다 유효한지 검사함
     validateEmail(email) &&
     validateNickname(nickname) &&
     validatePassword(password) &&
     password === confirmPassword;
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!isFormValid) return;
+    setIsLoading(true);
+    console.log("회원가입 성공", { email, nickname, password });
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+  };
+
   return (
-    <form>
-      <div>
-        <label>이메일</label>
-        <input
-          type="email"
-          value={email}
-          onChange={handleEmailChange}
-          required
-        />
-        {error.email && <p>{error.email}</p>}
-      </div>
+    <form onSubmit={handleSubmit} className="sign-in-form">
+      <TextField
+        label="이메일"
+        type="email"
+        value={email}
+        onChange={handleEmailChange}
+        required
+        error={!!error.email}
+        helperText={error.email}
+      />
 
-      <div>
-        <label>닉네임</label>
-        <input
-          type="text"
-          value={nickname}
-          onChange={handleNicknameChange}
-          required
-        />
-        {error.nickname && <p>{error.nickname}</p>}
-      </div>
+      <TextField
+        label="닉네임"
+        type="text"
+        value={nickname}
+        onChange={handleNicknameChange}
+        required
+        error={!!error.nickname}
+        helperText={error.nickname}
+      />
 
-      <div>
-        <label>비밀번호</label>
-        <input
-          type="password"
-          value={password}
-          onChange={handlePasswordChange}
-          required
-        />
-        {error.password && <p>{error.password}</p>}
-      </div>
+      <TextField
+        label="비밀번호"
+        type="password"
+        value={password}
+        onChange={handlePasswordChange}
+        required
+        error={!!error.password}
+        helperText={error.password}
+      />
 
-      <div>
-        <label>비밀번호 확인</label>
-        <input
-          type="password"
-          value={confirmPassword}
-          onChange={handleConfirmPasswordChange}
-          required
-        />
-        {error.confirmPassword && <p>{error.confirmPassword}</p>}
-      </div>
+      <TextField
+        label="비밀번호 확인"
+        type="password"
+        value={confirmPassword}
+        onChange={handleConfirmPasswordChange}
+        required
+        error={!!error.confirmPassword}
+        helperText={error.confirmPassword}
+      />
 
-      <button type="submit" disabled={!isFormValid}>
+      <Button
+        variant="outlined"
+        color="secondary"
+        fullWidth
+        disabled={!isFormValid || isLoading}
+        loading={isLoading}
+        loadingPosition="center"
+      >
         가입하기
-      </button>
+      </Button>
     </form>
   );
 };
