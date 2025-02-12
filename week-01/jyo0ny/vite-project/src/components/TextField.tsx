@@ -29,7 +29,7 @@ const TextField: React.FC<TextFieldProps> = ({
   size = "large",
   readOnly = false,
 }) => {
-  console.log(TextField);
+  // console.log(TextField);
   return (
     <div className={`textfield-container ${variant} ${size}`}>
       {label && <label>{label}</label>}
